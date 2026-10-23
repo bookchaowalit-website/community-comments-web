@@ -1,46 +1,42 @@
-# bookchaowalit-comments-frontend — Product brief
+# Comments Review Desk — Product truth
 
-**Slug:** `bookchaowalit-website/bookchaowalit-comments-frontend`  
-**Generated:** 2026-08-11 (bulk Book Dev closeout)  
-**Status:** starter / portfolio boundary
+> Inferred from the code and copy (no user interview). Checked against the portfolio card claims review
+> (`portfolio-site-web/docs/audits/CARD-CLAIMS-REVIEW-2026-10.md`, row `comments`, evidence Prototype) on 2026-10-23.
 
-## Purpose
+## What it is
 
-Portfolio repository under Book Dev. This brief records ownership and the
-current honest status so the nested tree is not an empty shell in the task
-system.
+A client-only demo of a comment moderation queue over browser-local data, seeded with two sample comments.
 
-## Runnable path
+## Who it is for
 
-See `README.md` for install and run instructions when present.
+A portfolio visitor who wants to see a small moderation UI: queue filters with counts, search, add and delete.
 
-## Limits
+## What works today
 
-- Not claimed as production-ready unless README and tests prove it.
-- Mobile smoke / emulator acceptance is separate and toolchain-dependent.
+1. Filter the queue by All, Pending, Approved or Spam (each with a live count) and search author and text.
+2. Add a comment (author required; empty text becomes "No note added.") with a chosen status; delete any comment.
+3. The queue is saved in localStorage and survives a reload; broken or foreign stored data is ignored and the samples
+   are shown instead.
+4. `/api/mcp` answers JSON-RPC with `list_comments` and `count_by_status` over the two sample comments (it cannot see
+   comments added in a browser).
+5. Front-end and server errors go to Sentry (errors only, personal data stripped) when `NEXT_PUBLIC_SENTRY_DSN` is set.
 
-## Source README excerpt
+## What does not work (and must not be claimed)
 
-```
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+- No self-hosted comment system, SQLite, server-side rendering, embeds, spam protection or portfolio-wide rollout
+  (claims removed from the portfolio card in the 2026-10 review).
+- No status change after adding, no replies, no account, no sync. No product analytics beyond Vercel Analytics.
 
-## Getting Started
+## Live URL and deploy state
 
-First, run the development server:
+- Live: https://comments.bookchaowalit.com (HTTP 200 on 2026-10-23).
+- The Vercel project `bookchaowalit-comments-frontend` is deployed only by CLI (last production 2026-10-23, CLI deploy
+  of commit 5d4675c, the Next 16.4.2 security patch) and its Git link names the old repository
+  `bookchaowalit/bookchaowalit-comments-frontend`, so a push to `main` does not deploy. The live site lags `main`
+  (no Sentry, template MCP route) until the owner reconnects Vercel Git to this repository (owner action D9).
+  `NEXT_PUBLIC_SENTRY_DSN` is already set on the Vercel project (Sentry project `community-comments-web`, org
+  `personal-yu0`).
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Boundaries
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize an
-```
+- Browser-only apart from the stateless `/api/mcp` route.
