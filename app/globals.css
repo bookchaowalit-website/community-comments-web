@@ -44,7 +44,7 @@ a { color: inherit; text-decoration: none; }
 .comment-row { display: grid; grid-template-columns: 112px minmax(0, 1fr) 28px; gap: 20px; align-items: center; min-height: 112px; border-bottom: 1px solid #bbb6ad; }
 .comment-stamp { align-self: start; gap: 7px; margin-top: 22px; color: #8c8880; font-size: 9px; }
 .stamp-approved { color: #2f7957; }.stamp-spam { color: #ae3e2f; }.stamp-pending { color: #9a6a2f; }
-.comment-meta { gap: 12px; }
+.comment-meta { display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px; }
 .comment-meta strong { font-size: 14px; font-weight: 500; }
 .comment-meta time { color: #9a958c; font: 10px 'DM Mono', monospace; }
 .comment-copy p { max-width: 48ch; margin: 8px 0 0; color: #5d5a54; font: 15px/1.45 'DM Serif Display', serif; }
