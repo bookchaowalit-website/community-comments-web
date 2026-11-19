@@ -25,7 +25,7 @@ A portfolio visitor who wants to see a small moderation UI: queue filters with c
 
 - No self-hosted comment system, SQLite, server-side rendering, embeds, spam protection or portfolio-wide rollout
   (claims removed from the portfolio card in the 2026-10 review).
-- No status change after adding, no replies, no account, no sync. No product analytics beyond Vercel Analytics.
+- No status change after adding, no replies, no account, no sync. No product analytics.
 
 ## Live URL and deploy state
 

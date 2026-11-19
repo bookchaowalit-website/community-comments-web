@@ -49,3 +49,17 @@ describe("addComment / removeComment", () => {
     expect(removeComment(SEED, "nope")).toHaveLength(2);
   });
 });
+
+describe("restoreComment and formatCreated", () => {
+  it("puts a comment back before its old neighbour, at the end otherwise, never twice", async () => {
+    const { restoreComment } = await import("@/lib/comments");
+    const [a, b] = SEED;
+    expect(restoreComment([b], a, "c-02").map((c) => c.id)).toEqual(["c-01", "c-02"]);
+    expect(restoreComment([a], b, null).map((c) => c.id)).toEqual(["c-01", "c-02"]);
+    expect(restoreComment([a, b], b, null)).toEqual([a, b]);
+  });
+  it("formats in UTC", async () => {
+    const { formatCreated } = await import("@/lib/comments");
+    expect(formatCreated(Date.UTC(2026, 7, 18, 23))).toBe("18 Aug 2026");
+  });
+});

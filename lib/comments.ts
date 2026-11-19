@@ -67,3 +67,15 @@ export function addComment(items: Comment[], draft: Draft, now: number): Comment
 export function removeComment(items: Comment[], id: string): Comment[] {
   return items.filter((item) => item.id !== id);
 }
+
+/** Put a removed comment back before the comment that followed it (or at the end), for Undo. */
+export function restoreComment(items: Comment[], comment: Comment, beforeId: string | null): Comment[] {
+  if (items.some((item) => item.id === comment.id)) return items;
+  const at = beforeId ? items.findIndex((item) => item.id === beforeId) : -1;
+  return at < 0 ? [...items, comment] : [...items.slice(0, at), comment, ...items.slice(at)];
+}
+
+/** "18 Aug 2026" in UTC, so the server and every browser print the same date. */
+export function formatCreated(timestamp: number): string {
+  return new Date(timestamp).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
+}

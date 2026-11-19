@@ -1,45 +1,29 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist } from "next/font/google";
+import { SITE_URL } from "@/lib/site";
 import "./globals.css";
-import { Analytics } from "@vercel/analytics/react";
-import { SpeedInsights } from "@vercel/speed-insights/next";
 
+// The font variable sits on <html>: the App shell tokens live on :root and read it from there.
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
-const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
+
+const title = "Comments | Bookchaowalit";
+const description = "A local moderation desk for demo comments: read, mark and remove them in this browser.";
 
 export const metadata: Metadata = {
-  title: "Comments | Bookchaowalit",
-  description: "Moderate demo comments locally.",
-  keywords: ["comments", "portfolio"],
+  title,
+  description,
   authors: [{ name: "Bookchaowalit", url: "https://bookchaowalit.com" }],
   creator: "Bookchaowalit",
-  metadataBase: new URL("https://bookchaowalit.com"),
-  openGraph: {
-    type: "website",
-    title: "Comments | Bookchaowalit",
-    description: "Moderate demo comments locally.",
-    siteName: "Bookchaowalit",
-  },
+  metadataBase: new URL(SITE_URL),
+  alternates: { canonical: "/" },
+  openGraph: { type: "website", title, description, siteName: "Bookchaowalit" },
   robots: { index: true, follow: true },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        {/* impeccable:contract
-          THESIS: A moderation desk should make the sentence readable before the status becomes the story.
-          OWN-WORLD: Editorial archive: paper ground, serif copy, ruled tape, and red/green status stamps.
-          STORY: Choose a queue, read the comment, then add or remove a local record.
-          FIRST VIEWPORT: Queue controls, review tape, and the new-note form establish the work immediately.
-          FORM: A left index rail, text-led inbox, and narrow compose column; no dashboard card grid.
-          FINISH: Local-only honesty, status names, visible focus, empty search state, and mobile filter wrap.
-          CONCEPT-SEED: 8b72de19 / assigned candidate 7 / direction
-        */}
-        <Analytics />
-        <SpeedInsights />
-        {children}
-      </body>
+    <html lang="en" className={geistSans.variable}>
+      <body>{children}</body>
     </html>
   );
 }

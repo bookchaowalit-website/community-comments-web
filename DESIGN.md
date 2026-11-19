@@ -1,20 +1,16 @@
-# Comments — design direction
+# Design
 
-<!-- impeccable:design-schema 1 -->
+Since 2026-11-19 the comments desk uses the shared **App shell** (see `APP-SHELL.md`; `app/app-shell.css` and `components/app-shell.tsx` are copied byte for byte
+from the reference site). It replaced the earlier one-off look, whose small uppercase labels, unloaded or
+render-blocking fonts and low-contrast text failed the design floor (review 2026-11-11).
 
-## World
+- Sidebar queue (All / Pending / Approved / Spam with counts; a pill row on phones), head with h1, count,
+  search and **New comment**, the composer in place (author, comment, Mark as segmented control).
+- Rows: author, one line of the comment (Show more for longer ones), date, a status pill (text + tint),
+  Remove. Removing is undoable for a few seconds; no confirm dialog.
+- Add stays disabled until the author has text, with a hint saying so (it used to return silently).
+- Empty states differ for an empty queue, an empty status and a search with no match (Clear search).
 
-Comments is a small editorial review desk. The sentence is set in a serif reading voice, the queue is a ruled tape, and status is a stamp at the margin. The interface feels like a working archive rather than a generic admin dashboard.
-
-## Direction contract
-
-- Seed: `8b72de19`; assigned grounded candidate 7.
-- First viewport: the moderation thesis, queue rail, review tape, and new-note form are visible together.
-- Form: left filter index, text-led list, narrow compose column, and stamped status labels.
-- Interaction: search, filter, add, and delete remain local and immediate.
-- Material: warm paper, charcoal ink, hairline rules, muted green approval, red spam, ochre pending.
-- Responsive rule: filters become a compact row and compose moves below the tape on narrow screens.
-
-## Constraints kept honest
-
-Data remains browser-local. The design does not imply a connected CMS, moderation team, or synced comment backend.
+Floor: Geist via `next/font` (variable on `<html>`), text ≥ 12px, controls ≥ 44px, 4.5:1 text contrast in
+light and dark, 3px focus ring, forced-colors support, no horizontal scroll at 320px. `/more-projects`
+redirects (308) to https://bookchaowalit.com/ and the footer links there.
