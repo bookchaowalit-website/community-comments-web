@@ -32,6 +32,9 @@ A portfolio visitor who wants to see a small moderation UI: queue filters with c
 - Two tabs: every add, remove and Undo reads the latest saved queue and writes in one synchronous step, a change
   that alters nothing writes nothing, and a save in another tab shows here through the `storage` event. There is no
   cross-tab lock, so two tabs saving in the same instant can still lose one save (Codex report -c876e5b30e).
+- Undo after another tab removed the next comment: the restored comment goes to the end of the queue instead of
+  its old place (A, B, C: remove A here, B there, Undo gives C, A). Multi-tab only; app frozen, not fixed (Codex
+  report -d08fe49058, P3).
 
 ## Live URL and deploy state
 

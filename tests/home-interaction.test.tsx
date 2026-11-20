@@ -157,6 +157,22 @@ describe("batch Undo", () => {
     // Back on the restored row removed last (it was second in the list).
     expect(document.activeElement).toBe(removeButton(1));
   });
+
+  it("Back to list goes to the next row with Undo kept, so a run of keyboard removals undoes as one", () => {
+    const before = rowIds();
+    click(removeButton(1), 0);
+    expect(document.activeElement).toBe(undoButton());
+    const back = [...host.querySelectorAll<HTMLButtonElement>(".as-toast button")].find((b) => b.textContent === "Back to list")!;
+    click(back, 0);
+    // The row that followed the removed one, and the toast is still there.
+    expect(document.activeElement).toBe(removeButton(1));
+    expect(host.querySelector(".as-toast")).not.toBeNull();
+    click(document.activeElement!, 0);
+    expect(document.activeElement).toBe(undoButton());
+    expect(host.querySelector(".as-toast span")!.textContent).toBe("Removed 2 comments");
+    click(undoButton(), 0);
+    expect(rowIds()).toEqual(before);
+  });
 });
 
 describe("two tabs", () => {
@@ -224,5 +240,14 @@ describe("Show more after web fonts load", () => {
     fontLoaded = true;
     await act(async () => { fontsReady(); await ready; });
     expect(button("Show more")).toBeDefined();
+  });
+});
+
+describe("Undo toast CSS", () => {
+  it("sizes to its content and lets the buttons wrap under the label on a phone", async () => {
+    const { readFileSync } = await import("node:fs");
+    const css = readFileSync(`${process.cwd()}/app/globals.css`, "utf8");
+    expect(css).toMatch(/\.as-toast \{[^}]*width: max-content;[^}]*flex-wrap: wrap;/);
+    expect(css).toMatch(/\.as-toast > span \{[^}]*white-space: normal;/);
   });
 });

@@ -6,3 +6,8 @@ html, body { margin: 0; background: var(--as-bg); }
 /* Comments additions on top of the App shell. */
 .as-hint { margin: 0; color: var(--as-muted); font-size: 14px; }
 .as-actions-row.as-center { justify-content: center; }
+/* The Undo toast carries Undo and Back to list. It sizes to its content (a fixed box at left: 50% would
+   otherwise shrink to half the screen) under the shell's 100vw − 32px cap, and on a phone the buttons wrap
+   under the label instead of cutting it to "Remo…". */
+.as-toast { width: max-content; flex-wrap: wrap; justify-content: flex-end; border-radius: 22px; }
+.as-toast > span { flex: 1 1 auto; min-width: 0; white-space: normal; overflow-wrap: anywhere; }

@@ -152,6 +152,14 @@ export default function Home() {
     setRemoved(null);
     setToastFocused(false);
   }
+  // Keyboard way back to the rows that keeps the Undo batch (Escape drops it): focus the row after the
+  // latest removal, else the one before it, else New comment. Removing that row adds it to the same batch.
+  function backToList() {
+    const last = removedRef.current?.entries.at(-1);
+    const rows = [...document.querySelectorAll<HTMLElement>(".as-row[data-comment]")];
+    const row = [last?.nextShown, last?.prevShown].map((id) => rows.find((r) => r.dataset.comment === id)).find(Boolean);
+    (row?.querySelector<HTMLButtonElement>(".as-danger") ?? newRef.current)?.focus();
+  }
   function undo() {
     const entries = removedRef.current?.entries;
     if (!entries?.length) return;
@@ -269,6 +277,7 @@ export default function Home() {
         >
           <span>{removedLabel(removed.entries)}</span>
           <button ref={undoRef} type="button" className="as-plain" onClick={undo} aria-label={removed.entries.length === 1 ? "Undo remove" : `Undo remove of ${removed.entries.length} comments`}>Undo</button>
+          <button type="button" className="as-plain" onClick={backToList}>Back to list</button>
         </div>
       ) : null}
 
