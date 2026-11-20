@@ -28,7 +28,17 @@ function CommentBody({ body }: { body: string }) {
     const observer = typeof ResizeObserver === "function" ? new ResizeObserver(measure) : null;
     observer?.observe(el);
     measure();
-    return () => observer?.disconnect();
+    // A web font that loads later can widen the text without resizing the box, so measure again then.
+    let live = true;
+    const fonts = typeof document !== "undefined" ? document.fonts : undefined;
+    const remeasure = () => { if (live) measure(); };
+    fonts?.ready?.then(remeasure, () => {});
+    fonts?.addEventListener?.("loadingdone", remeasure);
+    return () => {
+      live = false;
+      observer?.disconnect();
+      fonts?.removeEventListener?.("loadingdone", remeasure);
+    };
   }, [body]);
   const long = expanded || clipped || body.includes("\n");
   return (
@@ -103,9 +113,10 @@ export default function Home() {
 
   function add(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const next = addComment(items, draft, Date.now());
-    if (next === items) return;
-    setItems(next);
+    // Added to the latest saved queue, not the list this tab rendered (another tab may have saved since).
+    const now = Date.now();
+    const next = setItems((current) => addComment(current, draft, now));
+    if (next[0]?.id !== `c-${now}`) return;
     // Show the new comment: its own list, and no search that might hide it.
     if (filter !== "All" && filter !== draft.status) setFilter(draft.status);
     setQuery("");
@@ -118,11 +129,18 @@ export default function Home() {
     searchRef.current?.focus();
   }
   function remove(comment: Comment, viaKeyboard: boolean) {
-    const index = items.findIndex((item) => item.id === comment.id);
-    if (index < 0) return;
     const shownAt = visible.findIndex((item) => item.id === comment.id);
-    setItems((current) => current.filter((item) => item.id !== comment.id));
-    const entry: RemovedEntry = { comment, beforeId: items[index + 1]?.id ?? null, nextShown: visible[shownAt + 1]?.id, prevShown: shownAt > 0 ? visible[shownAt - 1].id : undefined };
+    // Removed from the latest saved queue; its neighbour there is what Undo puts it back before.
+    const hit = { found: false, beforeId: null as string | null };
+    setItems((current) => {
+      const index = current.findIndex((item) => item.id === comment.id);
+      if (index < 0) return current;
+      hit.found = true;
+      hit.beforeId = current[index + 1]?.id ?? null;
+      return current.filter((item) => item.id !== comment.id);
+    });
+    if (!hit.found) return;
+    const entry: RemovedEntry = { comment, beforeId: hit.beforeId, nextShown: visible[shownAt + 1]?.id, prevShown: shownAt > 0 ? visible[shownAt - 1].id : undefined };
     const entries = [...(removedRef.current?.entries ?? []), entry];
     setRemoved({ entries, viaKeyboard });
     setAnnouncement(entries.length === 1 ? `Removed the comment by ${comment.title}. Undo is available for a few seconds.` : `Removed ${entries.length} comments. Undo is available for a few seconds.`);

@@ -27,6 +27,12 @@ A portfolio visitor who wants to see a small moderation UI: queue filters with c
   (claims removed from the portfolio card in the 2026-10 review).
 - No status change after adding, no replies, no account, no sync. No product analytics.
 
+## Known limits
+
+- Two tabs: every add, remove and Undo reads the latest saved queue and writes in one synchronous step, a change
+  that alters nothing writes nothing, and a save in another tab shows here through the `storage` event. There is no
+  cross-tab lock, so two tabs saving in the same instant can still lose one save (Codex report -c876e5b30e).
+
 ## Live URL and deploy state
 
 - Live: https://comments.bookchaowalit.com (HTTP 200 on 2026-10-23).

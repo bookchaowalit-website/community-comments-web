@@ -158,3 +158,71 @@ describe("batch Undo", () => {
     expect(document.activeElement).toBe(removeButton(1));
   });
 });
+
+describe("two tabs", () => {
+  const otherTab = { id: "c-other", title: "olga", body: "Added in another tab.", status: "Pending", createdAt: 1710172800000 };
+  function saveFromOtherTab(event = false) {
+    const list = [otherTab, ...(JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "null") ?? SEED)];
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+    if (event) act(() => { window.dispatchEvent(new StorageEvent("storage", { key: STORAGE_KEY })); });
+  }
+  const saved = () => JSON.parse(localStorage.getItem(STORAGE_KEY)!).map((c: { title: string }) => c.title);
+  beforeEach(() => {
+    // This tab has already read (and cached) the queue before the other tab saves.
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(SEED));
+    act(() => { window.dispatchEvent(new StorageEvent("storage", { key: STORAGE_KEY })); });
+    expect(rows()).toEqual(["alice", "bob"]);
+  });
+
+  it("removing in a stale tab keeps the comment another tab saved", () => {
+    saveFromOtherTab();
+    press($('[aria-label="Remove the comment by alice"]')!);
+    expect(saved()).toEqual(["olga", "bob"]);
+  });
+
+  it("adding in a stale tab keeps the comment another tab saved", () => {
+    saveFromOtherTab();
+    press(button("New comment"));
+    type($<HTMLInputElement>(".as-composer input")!, "kai");
+    press(button("Add", $(".as-composer")!));
+    expect(saved()).toEqual(["kai", "olga", "alice", "bob"]);
+  });
+
+  it("a save in another tab shows here on its storage event", () => {
+    saveFromOtherTab(true);
+    expect(rows()).toContain("olga");
+  });
+
+  it("an Undo with nothing to restore writes nothing", () => {
+    press($('[aria-label="Remove the comment by alice"]')!);
+    const restored = JSON.stringify(SEED);
+    localStorage.setItem(STORAGE_KEY, restored); // another tab already put it back
+    press(button("Undo"));
+    expect(localStorage.getItem(STORAGE_KEY)).toBe(restored);
+  });
+});
+
+describe("Show more after web fonts load", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+    Reflect.deleteProperty(document, "fonts");
+  });
+
+  it("measures again when fonts are ready, so text a late font clips gets Show more", async () => {
+    act(() => root.unmount());
+    let fontsReady!: () => void;
+    const ready = new Promise<void>((resolve) => { fontsReady = resolve; });
+    Object.defineProperty(document, "fonts", { configurable: true, value: { ready, addEventListener: vi.fn(), removeEventListener: vi.fn() } });
+    let fontLoaded = false;
+    vi.spyOn(HTMLElement.prototype, "clientWidth", "get").mockReturnValue(200);
+    vi.spyOn(HTMLElement.prototype, "scrollWidth", "get").mockImplementation(function (this: HTMLElement) {
+      return fontLoaded && this.classList.contains("as-row-detail") ? 260 : 200;
+    });
+    root = createRoot(host);
+    act(() => root.render(<Home />));
+    expect(button("Show more")).toBeUndefined();
+    fontLoaded = true;
+    await act(async () => { fontsReady(); await ready; });
+    expect(button("Show more")).toBeDefined();
+  });
+});
